@@ -1,0 +1,36 @@
+{
+  "veiculos": 50,
+  "leituras": 5859,
+  "data_corte_treino": "2025-09-15",
+  "leituras_treino": 4108,
+  "leituras_teste": 1751,
+  "metricas": {
+    "n_amostras": 1751,
+    "mae_km": 1031.7,
+    "mape_pct": 0.49,
+    "mediana_erro_km": 569.8,
+    "p90_erro_km": 2574.7,
+    "por_horizonte": {
+      "<=30d": {
+        "n": 148.0,
+        "mae_km": 510.0,
+        "mape_pct": 0.28
+      },
+      "31-90d": {
+        "n": 422.0,
+        "mae_km": 720.75,
+        "mape_pct": 0.37
+      },
+      "91-180d": {
+        "n": 616.0,
+        "mae_km": 1133.12,
+        "mape_pct": 0.54
+      },
+      ">180d": {
+        "n": 565.0,
+        "mae_km": 1289.9,
+        "mape_pct": 0.58
+      }
+    }
+  }
+}

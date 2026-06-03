@@ -17,10 +17,27 @@ entender rápido o que sei fazer.
 
 ## 🚀 Projetos em destaque
 
-Os três projetos abaixo concentram o que considero mais representativo do meu trabalho.
-Cada um tem README próprio com contexto, decisões e resultados.
+Cada projeto abaixo tem README próprio com contexto, decisões e resultados.
 
-### 1. Predição de Churn em Telecom
+### 1. Previsão de Quilometragem de Frota (MKM) — autoria própria, uso real
+**Modelo que uso na gestão de frota, publicado a partir do núcleo para preservar a privacidade dos sistemas internos.**
+
+Recebe como entrada apenas o trio essencial — **`placa`, `data`, `km`** — e responde
+três perguntas práticas do dia a dia da operação: qual a média diária de cada
+veículo, qual o km esperado em uma data futura e em quantos dias um veículo bate
+em um km alvo (útil para revisão preventiva).
+
+- Estratégia hierárquica por veículo (regressão linear → incrementos → mediana da
+  frota) para responder bem em qualquer estágio de histórico.
+- Avaliação **temporal**, não aleatória, com erro reportado **por horizonte de previsão**.
+- Resultado em frota sintética de 50 veículos: **MAPE 0,49%**, com ~510 km de erro
+  médio em previsões de até 30 dias.
+- CLI utilitário: `python -m mkm.predict --placa ABC1A23 --data 2027-06-30`.
+
+🔧 `pandas` · `numpy` · `matplotlib` · `pytest`
+📁 [`projetos/previsao-km-frota`](projetos/previsao-km-frota)
+
+### 2. Predição de Churn em Telecom
 **Engenharia de ML: código modular, testes automatizados e resultados reprodutíveis.**
 
 Modelo que prevê quais clientes vão cancelar o serviço, para o time de retenção agir
@@ -36,7 +53,7 @@ modular, **testes (`pytest`)** e treino reprodutível por linha de comando.
 🔧 `pandas` · `scikit-learn` · `matplotlib` · `pytest`
 📁 [`projetos/predicao-churn-telecom`](projetos/predicao-churn-telecom)
 
-### 2. Detecção de Fraude em Cartão de Crédito
+### 3. Detecção de Fraude em Cartão de Crédito
 **Classificação com classes extremamente desbalanceadas (0,17% de fraudes).**
 
 Modelei a detecção de fraude sobre a base pública da ULB/Kaggle (284.807 transações,
@@ -53,7 +70,7 @@ falsos positivos a ponto de inviabilizar a operação.
 🔧 `pandas` · `scikit-learn` · `XGBoost` · `matplotlib`
 📁 [`projetos/deteccao-fraude-cartao`](projetos/deteccao-fraude-cartao)
 
-### 3. Análise de Sentimento de Reviews com LLM (Gemini)
+### 4. Análise de Sentimento de Reviews com LLM (Gemini)
 **Engenharia com LLM aplicada a dados reais de clientes.**
 
 Pipeline que analisa avaliações reais da Magalu coletadas do Google Maps e usa a
@@ -67,7 +84,7 @@ Pipeline que analisa avaliações reais da Magalu coletadas do Google Maps e usa
 🔧 `pandas` · `google-generativeai` (Gemini 1.5 Flash) · `numpy`
 📁 [`projetos/analise-reviews-magalu`](projetos/analise-reviews-magalu)
 
-### 4. Classificação Automática de Notícias (NLP)
+### 5. Classificação Automática de Notícias (NLP)
 **Pipeline de NLP reprodutível, da coleta à avaliação.**
 
 Coleta notícias automaticamente via *feeds* RSS e classifica os textos em categorias
