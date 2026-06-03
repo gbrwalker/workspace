@@ -43,9 +43,11 @@ O objetivo desta coleção é:
 
 ## Observações
 
+- Vários destes exercícios seguem o desafio **JavaScript30**, de Wes Bos, usado como base de
+  estudo. A pasta `Kenzie-Academy-...` é um projeto desenvolvido em grupo durante a formação
+  na Kenzie Academy.
 - Os projetos não utilizam frameworks ou bibliotecas avançadas, priorizando JavaScript puro.
-- Alguns projetos podem ter foco mais educacional do que visual.
-- Melhorias e refatorações podem ser aplicadas futuramente conforme evolução técnica.
+- Alguns projetos têm foco mais educacional do que visual.
 
 ---
 

@@ -135,6 +135,17 @@ Como continuidade do projeto, podem ser exploradas as seguintes melhorias:
 
 ---
 
+## Como Executar
+
+```bash
+pip install -r requirements.txt
+jupyter notebook Classificador_de_Noticias.ipynb
+```
+
+O notebook coleta as notícias ao vivo via RSS — não é necessário baixar nenhum dataset.
+
+---
+
 ## Observações Finais
 
 Este projeto foi desenvolvido com foco acadêmico, priorizando clareza metodológica, avaliação honesta e interpretação crítica dos resultados, atendendo plenamente aos requisitos da atividade proposta.

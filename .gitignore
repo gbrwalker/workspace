@@ -32,6 +32,7 @@ ipython_config.py
 # ============================================================
 .env
 .env.*
+!.env.example
 *.key
 secrets.json
 credentials.json
