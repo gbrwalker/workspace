@@ -1,0 +1,10 @@
+{
+  "n_total": 2500,
+  "churn_rate": 0.2596,
+  "test_size": 500,
+  "roc_auc": 0.8517,
+  "accuracy": 0.782,
+  "recall_churn": 0.7231,
+  "precision_churn": 0.5629,
+  "f1_churn": 0.633
+}
