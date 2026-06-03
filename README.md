@@ -20,7 +20,23 @@ entender rápido o que sei fazer.
 Os três projetos abaixo concentram o que considero mais representativo do meu trabalho.
 Cada um tem README próprio com contexto, decisões e resultados.
 
-### 1. Detecção de Fraude em Cartão de Crédito
+### 1. Predição de Churn em Telecom
+**Engenharia de ML: código modular, testes automatizados e resultados reprodutíveis.**
+
+Modelo que prevê quais clientes vão cancelar o serviço, para o time de retenção agir
+antes. Diferente de um notebook, é estruturado como **código de produção**: pacote
+modular, **testes (`pytest`)** e treino reprodutível por linha de comando.
+
+- *Pipeline* scikit-learn (sem vazamento de dados), `class_weight='balanced'` e
+  *permutation importance* para interpretar o modelo.
+- Tratamento de problemas reais de qualidade de dados detectados na base.
+- Resultado: **ROC-AUC 0,85**, capturando ~72% dos cancelamentos — com matriz de confusão,
+  curva ROC e ranking de variáveis **gerados pelo próprio código**.
+
+🔧 `pandas` · `scikit-learn` · `matplotlib` · `pytest`
+📁 [`projetos/predicao-churn-telecom`](projetos/predicao-churn-telecom)
+
+### 2. Detecção de Fraude em Cartão de Crédito
 **Classificação com classes extremamente desbalanceadas (0,17% de fraudes).**
 
 Modelei a detecção de fraude sobre a base pública da ULB/Kaggle (284.807 transações,
@@ -37,7 +53,7 @@ falsos positivos a ponto de inviabilizar a operação.
 🔧 `pandas` · `scikit-learn` · `XGBoost` · `matplotlib`
 📁 [`projetos/deteccao-fraude-cartao`](projetos/deteccao-fraude-cartao)
 
-### 2. Análise de Sentimento de Reviews com LLM (Gemini)
+### 3. Análise de Sentimento de Reviews com LLM (Gemini)
 **Engenharia com LLM aplicada a dados reais de clientes.**
 
 Pipeline que analisa avaliações reais da Magalu coletadas do Google Maps e usa a
@@ -51,7 +67,7 @@ Pipeline que analisa avaliações reais da Magalu coletadas do Google Maps e usa
 🔧 `pandas` · `google-generativeai` (Gemini 1.5 Flash) · `numpy`
 📁 [`projetos/analise-reviews-magalu`](projetos/analise-reviews-magalu)
 
-### 3. Classificação Automática de Notícias (NLP)
+### 4. Classificação Automática de Notícias (NLP)
 **Pipeline de NLP reprodutível, da coleta à avaliação.**
 
 Coleta notícias automaticamente via *feeds* RSS e classifica os textos em categorias
@@ -99,6 +115,7 @@ Comprovantes disponíveis em [`certificados/`](certificados):
 **Dados & ML:** Python, pandas, NumPy, scikit-learn, XGBoost, Matplotlib, Seaborn
 **LLM:** API do Google Gemini (`google-generativeai`)
 **NLP:** TF-IDF, feedparser
+**Engenharia & boas práticas:** Pipelines scikit-learn, testes com `pytest`, Git, ambientes reprodutíveis
 **BI & SQL:** Power BI, Looker Studio, SQL
 **Web:** JavaScript, HTML, CSS
 
