@@ -1,11 +1,12 @@
 {
-  "name": "scripts",
-  "version": "1.0.0",
-  "description": "",
+  "name": "linkedin-easy-apply-bot",
+  "version": "2.0.0",
+  "description": "LinkedIn Easy Apply Bot - Automação de candidaturas",
   "main": "./scripts/apply.ts",
   "scripts": {
     "start": "ts-node ./scripts/apply.ts",
-    "apply": "ts-node ./scripts/apply.ts SUBMIT"
+    "apply": "ts-node ./scripts/apply.ts SUBMIT",
+    "stats": "ts-node ./scripts/stats.ts"
   },
   "author": "",
   "license": "ISC",

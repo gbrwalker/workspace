@@ -3,13 +3,15 @@ import LanguageDetect from 'languagedetect';
 
 import buildUrl from '../utils/buildUrl';
 import wait from '../utils/wait';
+import logger from '../utils/logger';
+import retry from '../utils/retry';
 import selectors from '../selectors';
 
-const MAX_PAGE_SIZE = 7;
+const MAX_PAGE_SIZE = 25;
 const languageDetector = new LanguageDetect();
 
 async function getJobSearchMetadata({ page, location, keywords }: { page: Page, location: string, keywords: string }) {
-  await page.goto('https://linkedin.com/jobs', { waitUntil: "load" });
+  await retry(() => page.goto('https://linkedin.com/jobs', { waitUntil: "load" }));
 
   await page.type(selectors.keywordInput, keywords);
   await page.waitForSelector(selectors.locationInput, { visible: true });
@@ -20,14 +22,14 @@ async function getJobSearchMetadata({ page, location, keywords }: { page: Page, 
 
   const geoId = await page.evaluate(() => new URLSearchParams(document.location.search).get('geoId'));
 
-  const numJobsHandle = await page.waitForSelector(selectors.searchResultListText, { timeout: 5000 }) as ElementHandle<HTMLElement>;
-  const numAvailableJobs = await numJobsHandle.evaluate((el) => parseInt((el as HTMLElement).innerText.replace(',', '')));
+  const numJobsHandle = await page.waitForSelector(selectors.searchResultListText, { timeout: 10000 }) as ElementHandle<HTMLElement>;
+  const numAvailableJobs = await numJobsHandle.evaluate((el) => parseInt((el as HTMLElement).innerText.replace(/[,.\s]/g, '')));
 
   return {
     geoId,
     numAvailableJobs
   };
-};
+}
 
 interface PARAMS {
   page: Page,
@@ -36,18 +38,18 @@ interface PARAMS {
   workplace: { remote: boolean, onSite: boolean, hybrid: boolean },
   jobTitle: string,
   jobDescription: string,
-  jobDescriptionLanguages: string[]
-};
+  jobDescriptionLanguages: string[],
+  blacklistCompanies?: string[],
+}
 
-/**
- * Fetches job links as a user (logged in)
- */
-async function* fetchJobLinksUser({ page, location, keywords, workplace: { remote, onSite, hybrid }, jobTitle, jobDescription, jobDescriptionLanguages }: PARAMS): AsyncGenerator<[string, string, string]> {
+async function* fetchJobLinksUser({ page, location, keywords, workplace: { remote, onSite, hybrid }, jobTitle, jobDescription, jobDescriptionLanguages, blacklistCompanies = [] }: PARAMS): AsyncGenerator<[string, string, string]> {
   let numSeenJobs = 0;
   let numMatchingJobs = 0;
+  let numBlacklisted = 0;
   const fWt = [onSite, remote, hybrid].reduce((acc, c, i) => c ? [...acc, i + 1] : acc, [] as number[]).join(',');
 
   const { geoId, numAvailableJobs } = await getJobSearchMetadata({ page, location, keywords });
+  logger.info(`Total de vagas disponíveis: ${numAvailableJobs}`);
 
   const searchParams: { [key: string]: string } = {
     keywords,
@@ -57,7 +59,7 @@ async function* fetchJobLinksUser({ page, location, keywords, workplace: { remot
     f_AL: 'true'
   };
 
-  if(geoId) {
+  if (geoId) {
     searchParams.geoId = geoId.toString();
   }
 
@@ -65,52 +67,69 @@ async function* fetchJobLinksUser({ page, location, keywords, workplace: { remot
 
   const jobTitleRegExp = new RegExp(jobTitle, 'i');
   const jobDescriptionRegExp = new RegExp(jobDescription, 'i');
+  const blacklistRegExps = blacklistCompanies.map(c => new RegExp(c, 'i'));
 
   while (numSeenJobs < numAvailableJobs) {
     url.searchParams.set('start', numSeenJobs.toString());
 
-    await page.goto(url.toString(), { waitUntil: "load" });
+    try {
+      await retry(() => page.goto(url.toString(), { waitUntil: "load" }));
+    } catch (err) {
+      logger.error(`Falha ao carregar página de resultados (start=${numSeenJobs})`, err);
+      break;
+    }
 
-    await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${Math.min(MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs)})`, { timeout: 5000 });
+    const expectedItems = Math.min(MAX_PAGE_SIZE, numAvailableJobs - numSeenJobs);
+    await page.waitForSelector(`${selectors.searchResultListItem}:nth-child(${expectedItems})`, { timeout: 10000 }).catch(() => {
+      logger.warn(`Timeout esperando ${expectedItems} resultados, continuando com o que tem`);
+    });
 
     const jobListings = await page.$$(selectors.searchResultListItem);
 
-    for (let i = 0; i < Math.min(jobListings.length, MAX_PAGE_SIZE); i++) {
+    for (let i = 0; i < jobListings.length; i++) {
       try {
         const [link, title] = await page.$eval(`${selectors.searchResultListItem}:nth-child(${i + 1}) ${selectors.searchResultListItemLink}`, (el) => {
           const linkEl = el as HTMLLinkElement;
-
           linkEl.click();
-
           return [linkEl.href.trim(), linkEl.innerText.trim()];
         });
 
         await page.waitForFunction(async (selectors) => {
           const hasLoadedDescription = !!document.querySelector<HTMLElement>(selectors.jobDescription)?.innerText.trim();
           const hasLoadedStatus = !!(document.querySelector(selectors.easyApplyButtonEnabled) || document.querySelector(selectors.appliedToJobFeedback));
-
           return hasLoadedStatus && hasLoadedDescription;
-        }, {}, selectors);
+        }, { timeout: 10000 }, selectors);
 
-        const companyName = await page.$eval(`${selectors.searchResultListItem}:nth-child(${i + 1}) ${selectors.searchResultListItemCompanyName}`, el => (el as HTMLElement).innerText).catch(() => 'Unknown');;
-        const jobDescription = await page.$eval(selectors.jobDescription, el => (el as HTMLElement).innerText);
+        const companyName = await page.$eval(`${selectors.searchResultListItem}:nth-child(${i + 1}) ${selectors.searchResultListItemCompanyName}`, el => (el as HTMLElement).innerText).catch(() => 'Desconhecida');
+
+        if (blacklistRegExps.some(re => re.test(companyName))) {
+          numBlacklisted++;
+          logger.info(`Empresa na blacklist: ${companyName} - pulando`);
+          continue;
+        }
+
+        const jobDescriptionText = await page.$eval(selectors.jobDescription, el => (el as HTMLElement).innerText);
         const canApply = !!(await page.$(selectors.easyApplyButtonEnabled));
-        const jobDescriptionLanguage = languageDetector.detect(jobDescription, 1)[0][0];
-        const matchesLanguage = jobDescriptionLanguages.includes("any") || jobDescriptionLanguages.includes(jobDescriptionLanguage);
 
-        if (canApply && jobTitleRegExp.test(title) && jobDescriptionRegExp.test(jobDescription) && matchesLanguage) {
+        let matchesLanguage = jobDescriptionLanguages.includes("any");
+        if (!matchesLanguage) {
+          const detected = languageDetector.detect(jobDescriptionText, 3);
+          matchesLanguage = detected.some(([lang]) => jobDescriptionLanguages.includes(lang));
+        }
+
+        if (canApply && jobTitleRegExp.test(title) && jobDescriptionRegExp.test(jobDescriptionText) && matchesLanguage) {
           numMatchingJobs++;
-
+          logger.info(`[${numMatchingJobs}] Match: ${title} @ ${companyName}`);
           yield [link, title, companyName];
         }
       } catch (e) {
-        console.log(e);
+        logger.warn(`Erro ao processar vaga ${i + 1} na página`, e);
       }
     }
 
     await wait(2000);
-
     numSeenJobs += jobListings.length;
+    logger.info(`Progresso: ${numSeenJobs}/${numAvailableJobs} vagas analisadas | ${numMatchingJobs} matches | ${numBlacklisted} blacklisted`);
   }
 }
 

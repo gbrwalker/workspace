@@ -106,5 +106,11 @@ dist
 # Ignore config
 config.ts
 
+# Application tracker data
+applications.json
+
+# Bot logs
+logs/
+
 #ignore CV.pdf
 CV.pdf

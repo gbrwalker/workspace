@@ -5,58 +5,53 @@ export default {
 
   // JOB SEARCH PARAMETERS
   KEYWORDS: "javascript",
-  LOCATION: "Portugal",
+  LOCATION: "Brazil",
   WORKPLACE: {
     REMOTE: true,
-    ON_SITE: true,
-    HYBRID: false,
+    ON_SITE: false,
+    HYBRID: true,
   },
-  JOB_TITLE: "(javascript|frontend|front-end|fullstack|full-stack|nodejs|node|js).*(developer|engineer)",
-  JOB_DESCRIPTION: "^((?!(primeit))(.|[\n\r]))*$",
-  JOB_DESCRIPTION_LANGUAGES: ["portuguese", "english"], // replace value with ["any"] to accept all job description laguages
+  JOB_TITLE: "(javascript|frontend|front-end|fullstack|full-stack|nodejs|node|react|typescript).*(developer|engineer|desenvolvedor|engenheiro)",
+  JOB_DESCRIPTION: "^((?!(empresa_bloqueada))(.|[\n\r]))*$",
+  JOB_DESCRIPTION_LANGUAGES: ["portuguese", "english"],
+
+  // COMPANY BLACKLIST - skip jobs from these companies (case-insensitive)
+  BLACKLIST_COMPANIES: [] as string[],
 
   // FORM DATA
-  PHONE: "912345678",
+  PHONE: "",
   CV_PATH: "",
   COVER_LETTER_PATH: "",
-  HOME_CITY: "Lisbon, Portugal",
+  HOME_CITY: "",
   YEARS_OF_EXPERIENCE: {
-    "angular": 5,
-    "react.js": 6,
-    ".net": 3,
-    "php": 4,
-    "spring": 4,
-    "java": 4,
-    "magento": 5,
-    "node": 5,
-    "javascript": 5,
-    "mongodb": 5,
-    "kubernetes": 5,
-    "CI/CD": 5,
-    "python": 5,
-    "drupal": 5,
-    "sass": 5,
-    "html": 5,
-    "google cloud": 5,
-    "docker": 5,
-    "terraform": 5,
-    "css": 4,
-    "typescript": 6,
-    "webmethods": 5
-  },
+    "angular": 0,
+    "react": 0,
+    "node": 0,
+    "javascript": 0,
+    "typescript": 0,
+    "python": 0,
+    "html": 0,
+    "css": 0,
+    "docker": 0,
+    "git": 0,
+  } as { [key: string]: number },
   LANGUAGE_PROFICIENCY: {
     "english": "professional",
-    "spanish": "native",
-    "french": "native"
-  },
+    "portuguese": "native",
+  } as { [key: string]: string },
   REQUIRES_VISA_SPONSORSHIP: false,
-  TEXT_FIELDS: { "salary": "60k" },
+  TEXT_FIELDS: {} as { [key: string]: string },
   BOOLEANS: {
-    "bachelhor|bacharelado": true,
-    "authorized": true
-  },
-  MULTIPLE_CHOICE_FIELDS: { "pronouns": "They/them" },
+    "bachelor|bacharelado|graduação": true,
+    "authorized|autorizado": true,
+  } as { [key: string]: boolean },
+  MULTIPLE_CHOICE_FIELDS: {} as { [key: string]: string },
 
-  // OTHER SETTINGS
-  SINGLE_PAGE: false,
+  // CV MAPPING - select CV based on job title regex (first match wins, falls back to CV_PATH)
+  CV_MAPPING: [] as { jobTitleRegex: string; cvPath: string }[],
+
+  // SETTINGS
+  SINGLE_PAGE: true,
+  HEADLESS: false,
+  MAX_FORM_PAGES: 10,
 }
