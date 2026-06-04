@@ -1,7 +1,7 @@
 export default {
-  // LOGIN DETAILS
-  LINKEDIN_EMAIL: "",
-  LINKEDIN_PASSWORD: "",
+  // LOGIN DETAILS (use env vars: LINKEDIN_EMAIL and LINKEDIN_PASSWORD)
+  LINKEDIN_EMAIL: process.env.LINKEDIN_EMAIL || "",
+  LINKEDIN_PASSWORD: process.env.LINKEDIN_PASSWORD || "",
 
   // JOB SEARCH PARAMETERS
   KEYWORDS: "javascript",
@@ -11,7 +11,7 @@ export default {
     ON_SITE: false,
     HYBRID: true,
   },
-  JOB_TITLE: "(javascript|frontend|front-end|fullstack|full-stack|nodejs|node|react|typescript).*(developer|engineer|desenvolvedor|engenheiro)",
+  JOB_TITLE: "(javascript|frontend|front-end|fullstack|full-stack|nodejs|node|react|typescript).*(developer|engineer|desenvolvedor|engenheiro)|(desenvolvedor|engenheiro).*(javascript|frontend|front-end|fullstack|full-stack|nodejs|node|react|typescript)",
   JOB_DESCRIPTION: "^((?!(empresa_bloqueada))(.|[\n\r]))*$",
   JOB_DESCRIPTION_LANGUAGES: ["portuguese", "english"],
 
